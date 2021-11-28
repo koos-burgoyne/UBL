@@ -4,6 +4,8 @@
 import numpy as np
 # Import os library for use in ...
 import os
+# Import matplotlib.pyplot for use in ...
+import matplotlib.pyplot as plt
 
 # Function info here ...
 def import_fa(file_name, return_labels=False):
@@ -39,7 +41,7 @@ def import_fa(file_name, return_labels=False):
 
 # Function info here ...
 def import_folder(folder_path, return_names=False):
-    print("Reading contents of folder: "+folder_path)
+    print("\nReading contents of folder: "+folder_path)
     # List storage for files and file names
     files = []
     file_names = []
@@ -128,20 +130,37 @@ def retrieve_features(files, fnames=None):
         return np.array(sequences_as_features, dtype=object)
 
 # Function info here ...
-def print_stats(files, file_names):
-    print("Data Stats:")
+def print_stats(files, file_names, print_nuc=False, plot=False):
+    print("\nData Stats:")
+    nucleotides = {}
+    total_char = np.zeros(len(files))
+    idx_counter = 0
     for file,fname in zip(files,file_names):
+        if len(nucleotides) == 0:
+            nucleotides[fname] = {}
+        else:
+            prev_fname = list(nucleotides)[-1]
+            nucleotides[fname] = nucleotides[prev_fname].copy()
+            for nuc in nucleotides[fname]:
+                nucleotides[fname][nuc] = 0
+        fname_dict = nucleotides[fname]
         max = 0
         min = 1e6
         mean_length = 0
         print("  "+fname)
         for sequence in file:
             seq_len = len(sequence)
-            if seq_len > max:
-                max = seq_len
             if seq_len < min:
                 min = seq_len
+            if seq_len > max:
+                max = seq_len
             mean_length += seq_len
+            total_char[idx_counter] += seq_len
+            for nuc in sequence:
+                if nuc not in fname_dict:
+                    fname_dict[nuc] = 0
+                else:
+                    fname_dict[nuc] += 1
         mean_length /= len(file)
         std_dev = 0
         for sequence in file:
@@ -150,3 +169,34 @@ def print_stats(files, file_names):
         print("    Max : "+str(max))
         print("    Mean: "+str(round(mean_length,3)))
         print("    StdD: "+str(round(np.sqrt(std_dev/(len(file)-1)),3)))
+        if print_nuc:
+            print("    Nucleotides Porportion of Occurence:")
+            for nuc,count in fname_dict.items():
+                print("        "+nuc+": "+str(round(fname_dict[nuc]/total_char[idx_counter],3)))
+        idx_counter += 1
+    if plot:
+        num_ticks = 0
+        keys = None
+        for fname,dict in nucleotides.items():
+            num_ticks = len(dict)
+            keys = dict.keys()
+            break
+        xtick_loc = np.linspace(1,num_ticks*4,num_ticks)
+        width = 0.9
+        plt.figure()
+        idx_counter = 0
+        for fname,dict in nucleotides.items():
+            for nuc in dict:
+                dict[nuc] /= total_char[idx_counter]
+            #for i in range(len(xtick_loc)):
+            #    xtick_loc[i] += (float(idx_counter)*width)
+            plt.bar(xtick_loc+idx_counter*width, dict.values(), label=fname)
+            idx_counter += 1
+        plt.ylabel("Proportion of Total Nucleotides")
+        plt.xlabel("Nucleotides")
+        xtick_loc = np.linspace(1,num_ticks*4,num_ticks)
+        plt.xticks(xtick_loc+width, keys)
+        plt.legend()
+        plt.show()
+    print()
+    return
