@@ -85,7 +85,7 @@ def sequences_to_features(sequences):
     features = [[] for i in range(num_features)]
     # Iterate over all sequences in 'sequences' array
     for i,seq in enumerate(sequences):
-        # Iterate over all nucleotides in a sequence
+        # Iterate over all amino_acids in a sequence
         for j in seq:
             # Iterate over all features
             for k,feature in enumerate(feature_lib.items()):
@@ -130,24 +130,60 @@ def retrieve_features(files, fnames=None):
         return np.array(sequences_as_features, dtype=object)
 
 # Function info here ...
-def print_stats(files, file_names, print_nuc=False, plot=False):
+def plot_acid_proportions(amino_acids, total_char):
+    num_ticks = 0
+    keys = None
+    # Get the keys and number of keys for plotting
+    for fname,dict in amino_acids.items():
+        num_ticks = len(dict)
+        keys = dict.keys()
+        break
+    # Plotting variables
+    xtick_loc = np.linspace(1,num_ticks*4,num_ticks)
+    width = 0.9
+    plt.figure()
+    idx_counter = 0
+    for fname,dict in amino_acids.items():
+        for acid in dict:
+            dict[acid] /= total_char[idx_counter]
+        plt.bar(xtick_loc+idx_counter*width, dict.values(), label=fname)
+        idx_counter += 1
+    plt.ylabel("Proportion of Total Amino Acids")
+    plt.xlabel("Amino Acids")
+    xtick_loc = np.linspace(1,num_ticks*4,num_ticks)
+    plt.xticks(xtick_loc+width, keys)
+    plt.legend()
+    plt.show()
+    return
+
+# Function info here ...
+def print_stats(files, file_names, print_acid_prop=False, plot=False):
     print("\nData Stats:")
-    nucleotides = {}
+    amino_acids = {}
     total_char = np.zeros(len(files))
     idx_counter = 0
+    # Iterate over all files in the input array 'files', along with the corresponding file names
     for file,fname in zip(files,file_names):
-        if len(nucleotides) == 0:
-            nucleotides[fname] = {}
+        # If on the first file, start a new dictionary to store acidleotide counts
+        if len(amino_acids) == 0:
+            amino_acids[fname] = {}
+        # If on a subsequent file, copy the previous files dictionary
+        # This ensures the same amino_acids are covered in the same order
+        # Set the counts to 0 for this file
         else:
-            prev_fname = list(nucleotides)[-1]
-            nucleotides[fname] = nucleotides[prev_fname].copy()
-            for nuc in nucleotides[fname]:
-                nucleotides[fname][nuc] = 0
-        fname_dict = nucleotides[fname]
+            prev_fname = list(amino_acids)[-1]
+            amino_acids[fname] = amino_acids[prev_fname].copy()
+            for acid in amino_acids[fname]:
+                amino_acids[fname][acid] = 0
+        # Function variables for computing stats
+        fname_dict = amino_acids[fname]
         max = 0
         min = 1e6
         mean_length = 0
         print("  "+fname)
+        # Across all sequences, find the min and max length sequences,
+        # count the occurrences of each amino acid, and find the mean
+        # and standard deviation of all sequence lengths in this file. 
         for sequence in file:
             seq_len = len(sequence)
             if seq_len < min:
@@ -156,47 +192,28 @@ def print_stats(files, file_names, print_nuc=False, plot=False):
                 max = seq_len
             mean_length += seq_len
             total_char[idx_counter] += seq_len
-            for nuc in sequence:
-                if nuc not in fname_dict:
-                    fname_dict[nuc] = 0
+            for acid in sequence:
+                if acid not in fname_dict:
+                    fname_dict[acid] = 0
                 else:
-                    fname_dict[nuc] += 1
+                    fname_dict[acid] += 1
         mean_length /= len(file)
         std_dev = 0
         for sequence in file:
             std_dev += (mean_length - len(sequence))**2
+        # Print the basic stats
         print("    Min : "+str(min))
         print("    Max : "+str(max))
         print("    Mean: "+str(round(mean_length,3)))
         print("    StdD: "+str(round(np.sqrt(std_dev/(len(file)-1)),3)))
-        if print_nuc:
-            print("    Nucleotides Porportion of Occurence:")
-            for nuc,count in fname_dict.items():
-                print("        "+nuc+": "+str(round(fname_dict[nuc]/total_char[idx_counter],3)))
+        # If argument is True, print amino acid proportions
+        if print_acid_prop:
+            print("    amino_acids Porportion of Occurence:")
+            for acid,count in fname_dict.items():
+                print("        "+acid+": "+str(round(fname_dict[acid]/total_char[idx_counter],3)))
         idx_counter += 1
-    if plot:
-        num_ticks = 0
-        keys = None
-        for fname,dict in nucleotides.items():
-            num_ticks = len(dict)
-            keys = dict.keys()
-            break
-        xtick_loc = np.linspace(1,num_ticks*4,num_ticks)
-        width = 0.9
-        plt.figure()
-        idx_counter = 0
-        for fname,dict in nucleotides.items():
-            for nuc in dict:
-                dict[nuc] /= total_char[idx_counter]
-            #for i in range(len(xtick_loc)):
-            #    xtick_loc[i] += (float(idx_counter)*width)
-            plt.bar(xtick_loc+idx_counter*width, dict.values(), label=fname)
-            idx_counter += 1
-        plt.ylabel("Proportion of Total Nucleotides")
-        plt.xlabel("Nucleotides")
-        xtick_loc = np.linspace(1,num_ticks*4,num_ticks)
-        plt.xticks(xtick_loc+width, keys)
-        plt.legend()
-        plt.show()
     print()
+    # Plot amino acid proportions of all files contained in the input array 'files'
+    if plot:
+        plot_acid_proportions(amino_acids, total_char)
     return
