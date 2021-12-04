@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 # Function info here ...
 def import_fa(file_name, return_labels=False):
+    print("Importing "+file_name)
     # List storage for file contents (sequences) and sequene labels
     sequences = []
     labels = []
@@ -73,6 +74,143 @@ def import_folder(folder_path, return_names=False):
     # If False, only return a 2D array of the contents of the files
     else:
         return np.array(files, dtype=object)
+
+# Function info here ...
+def raw_to_features(data,balance=False,resample=1.0):
+    print("\nConverting to features:")
+    n = len(data)
+    # Find basic data stats for function use:
+    #   the max length sequence in the data
+    #   the number of classes
+    #   count of each class
+    max_seq_len = 0
+    class_counts = [0]
+    num_classes = -1
+    # Iterate over all sequences
+    for line in data:
+        # Look out for a new class
+        if "class" in line:
+            class_counts.append(1)
+            num_classes += 1
+            continue
+        # Update max sequence length
+        if len(line) > max_seq_len:
+            max_seq_len = len(line)
+        # Update class counts
+        class_counts[num_classes+1] += 1
+    
+    # Since this was -1 based, increment to convert to 0 based count
+    num_classes += 1
+    
+    # Print stats found above
+    print("  Num Classes:", num_classes)
+    print("  Class Counts:")
+    frmt = "{:>7}"*num_classes
+    print(" "+frmt.format(*[i for i in range(num_classes)]))
+    print("   ",end="")
+    frmt = "{:>7}"*num_classes
+    print(" "+frmt.format(*[class_counts[i] for i in range(1,num_classes+1)]))
+
+    # Split data by class for resampling
+    data_by_class = []
+    for i in range(num_classes):
+        data_by_class.append( data[class_counts[i]:class_counts[i+1]] )
+    
+    # Instantiate storage of features and labels
+    X = []
+    y = []
+    
+    # Init variables for resampling
+    total_per_class = 0
+    num_samples = n
+    # If resampling:
+    if resample != 1.0:
+        # Calculate the size of the resampled dataset
+        num_samples = int(n*resample)
+        # If balanced classs coutns are required:
+        if balance:
+            # Calculate a balanced total number of instances per class
+            total_per_class = int(num_samples/num_classes)
+            # Pull instances
+            for i in range(num_classes):
+                for j in range(1,total_per_class+1): 
+                    X.append( data_by_class[i][j] )
+            # Pull labels
+            for i in range(num_classes):
+                for j in range(total_per_class):
+                    y.append(i)
+        # If imbalanced class counts are acceptable
+        else:
+            # Calculate the total number of instances per class in the same ratio as class counts
+            total_per_class = [int(num_samples*class_counts[i+1]/n) for i in range(num_classes)]
+            # Pull instances
+            for i in range(num_classes):
+                for j in range(total_per_class[i]+1,total_per_class[i+1]+1):
+                    X.append( data_by_class[i][j] )
+            # Pull labels
+            for i in range(num_classes):
+                for j in range(total_per_class):
+                    y.append(i)
+        print("  Resampling:")
+        print("    Total samples:",num_samples)
+        print("    Total/class  :",total_per_class)
+        print()
+    # If not resampling
+    # TODO:  Complete - could the above be used instead of conditional?
+    else:
+        total_per_class = int(n/num_classes)
+    
+    # Convert from strings to arrays and pad the sequences with zeros to 
+    # the length of the maximum length sequence; this is the number of features
+    for i in range(len(X)):
+        # Instantiate new array of zeros
+        new_instance = [0 for i in range(max_seq_len)]
+        # Fill in sequence
+        for j in range(len(X[i])):
+            new_instance[j] = X[i][j]
+        # Store new sequence in features store X
+        X[i] = new_instance
+
+    # Return features and labels
+    return X,y
+    """# Instantiate new data storage
+    X = np.zeros((num_samples,max_seq_len), dtype=np.object_)
+    y = np.zeros(num_samples)      # This implies that there are always 2 classes
+    # Iterate over the data filling in X and y
+    class_val = -1
+    X_line = 0
+    line = 0
+    class_count = 0
+    while line < n:
+        # TODO: Track and print progress
+        #if line%(n/100)==0:
+        #    print(str(line/n*100)+"%",end="\r")
+        # Assign the class value
+        if "class" in data[line]:
+            class_val = int(data[line][-1])
+            line+=1
+            class_count += 1
+            continue
+        # If the class quota is met, then continue to next class
+        if class_counts[class_val] == total_per_class:
+                if class_count == num_classes:
+                    break
+                while line < n and "class" not in data[line]:
+                    line += 1
+                continue
+        # Fill in the data instance, and pad it with zeros
+        class_counts[class_val] += 1
+        m = len(data[line])
+        for char in range(max_seq_len):
+            if char < m:
+                X[X_line][char] = data[line][char]
+            else:
+                X[X_line][char] = 0
+        y[X_line] = int(class_val)
+        X_line += 1
+        # loop increment
+        line += 1
+    print()"""
 
 # Function info here ...
 def sequences_to_features(sequences):
