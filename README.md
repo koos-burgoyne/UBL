@@ -21,12 +21,12 @@ The data was split 80:20 into modelling/validation data, and the modelling data 
 
 #### Initial Results
 From today's (Dec4,21) testing on a toy version of the dataset with arbitrary model layers:
-  Model train time    : 1hr 25min (255s/epoch, 8s/step)
-  Final Train Accuracy: 92.2%
-  Final Test Accuracy : 79.42%
-  Validation Accuracy : 83.03%
+  * Model train time    : 1hr 25min (255s/epoch, 8s/step)
+  * Final Train Accuracy: 92.2%
+  * Final Test Accuracy : 79.42%
+  * Validation Accuracy : 83.03%
 
-![Classification percent accuracy by epoch] (/assets/accuracy_dec4.png "Classification percent accuracy by epoch")
+![Classification percent accuracy by epoch](/assets/accuracy_dec4.png "Classification percent accuracy by epoch")
 
 It seems possible that with a well planned model, more training epochs, and a properly formatted dataset, this method has the potential to perform the required task.
 
