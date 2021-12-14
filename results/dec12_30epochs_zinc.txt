@@ -1,0 +1,129 @@
+Importing data/pos_neg.fa
+    2 classes
+    56108 sequences
+    [ 3258 52850] class counts
+
+Converting to features:
+  Num Classes: 2
+  Class Counts:
+       0      1
+       3258  52850
+
+total/class: 3258 
+
+  Resampling:
+    Dataset size : 56108
+    Total samples: 11221
+    Total/class  : 3258
+
+Time taken: 188.481 sec
+shape of X: (6514, 28, 5537)
+shape of y: (6514,)
+
+Shape of X      : (5211, 28, 5537)
+Shape of train_X: (4168, 28, 5537)
+Shape of valid_X: (1303, 28, 5537)
+
+Class distributions:
+  Train/Test: [2613, 2598]
+  Validation: [644, 659]
+
+n (no. train samples): 4168
+m (num features)     : 28
+o (length of seqs)   : 5537
+
+# Some model parameters
+batch_size = 64
+epochs = 30
+num_classes = 2
+
+# Instantiate the model
+model = Sequential()
+
+# Add layers
+model.add(Conv2D(filters=32, kernel_size=(m,3),activation='linear',input_shape=(m,o,1),padding='same'))
+model.add(LeakyReLU(alpha=0.1))
+model.add(MaxPooling2D(pool_size=2,padding='same'))
+
+model.add(Conv2D(filters=64, kernel_size=(1,3),activation='linear',padding='same'))
+model.add(LeakyReLU(alpha=0.1))
+model.add(MaxPooling2D(pool_size=2,padding='same'))
+
+model.add(Flatten())
+model.add(Dense(num_classes, activation='softmax'))
+
+# Compile the model
+# For now, this gives errors about loading the dynamic library for GPU use
+model.compile(
+    loss=keras.losses.categorical_crossentropy, 
+    optimizer=keras.optimizers.Adam(),
+    metrics=['accuracy']
+)
+
+
+Number of validation samples: 1303
+41/41 [==============================] - 42s 1s/step - loss: 2.1797 - accuracy: 0.7675
+[[375 269]
+ [ 34 625]]
+
+
+Epoch 1/30
+66/66 [==============================] - 544s 8s/step - loss: 821.2397 - accuracy: 0.5535 - val_loss: 103.5981 - val_accuracy: 0.4976
+Epoch 2/30
+66/66 [==============================] - 532s 8s/step - loss: 28.1043 - accuracy: 0.5998 - val_loss: 5.3652 - val_accuracy: 0.6788
+Epoch 3/30
+66/66 [==============================] - 531s 8s/step - loss: 13.6826 - accuracy: 0.6435 - val_loss: 12.7167 - val_accuracy: 0.5206
+Epoch 4/30
+66/66 [==============================] - 534s 8s/step - loss: 11.5070 - accuracy: 0.6471 - val_loss: 7.6324 - val_accuracy: 0.6874
+Epoch 5/30
+66/66 [==============================] - 535s 8s/step - loss: 6.1797 - accuracy: 0.7164 - val_loss: 10.3322 - val_accuracy: 0.5762
+Epoch 6/30
+66/66 [==============================] - 531s 8s/step - loss: 4.2865 - accuracy: 0.7409 - val_loss: 6.6146 - val_accuracy: 0.5781
+Epoch 7/30
+66/66 [==============================] - 532s 8s/step - loss: 5.1829 - accuracy: 0.7318 - val_loss: 5.1397 - val_accuracy: 0.7546
+Epoch 8/30
+66/66 [==============================] - 531s 8s/step - loss: 2.9790 - accuracy: 0.7721 - val_loss: 2.1422 - val_accuracy: 0.7450
+Epoch 9/30
+66/66 [==============================] - 531s 8s/step - loss: 1.9357 - accuracy: 0.8040 - val_loss: 4.6294 - val_accuracy: 0.7478
+Epoch 10/30
+66/66 [==============================] - 531s 8s/step - loss: 2.7913 - accuracy: 0.7881 - val_loss: 11.0185 - val_accuracy: 0.6568
+Epoch 11/30
+66/66 [==============================] - 533s 8s/step - loss: 2.8290 - accuracy: 0.7865 - val_loss: 1.6174 - val_accuracy: 0.8226
+Epoch 12/30
+66/66 [==============================] - 531s 8s/step - loss: 1.4152 - accuracy: 0.8369 - val_loss: 1.8881 - val_accuracy: 0.7373
+Epoch 13/30
+66/66 [==============================] - 530s 8s/step - loss: 0.9672 - accuracy: 0.8563 - val_loss: 2.6158 - val_accuracy: 0.8188
+Epoch 14/30
+66/66 [==============================] - 531s 8s/step - loss: 1.4331 - accuracy: 0.8265 - val_loss: 1.3477 - val_accuracy: 0.8063
+Epoch 15/30
+66/66 [==============================] - 531s 8s/step - loss: 1.5682 - accuracy: 0.8366 - val_loss: 3.0058 - val_accuracy: 0.8140
+Epoch 16/30
+66/66 [==============================] - 531s 8s/step - loss: 35.8347 - accuracy: 0.6219 - val_loss: 208.7478 - val_accuracy: 0.5034
+Epoch 17/30
+66/66 [==============================] - 533s 8s/step - loss: 115.6758 - accuracy: 0.6029 - val_loss: 32.0147 - val_accuracy: 0.5868
+Epoch 18/30
+66/66 [==============================] - 531s 8s/step - loss: 11.1195 - accuracy: 0.7447 - val_loss: 5.6099 - val_accuracy: 0.7785
+Epoch 19/30
+66/66 [==============================] - 531s 8s/step - loss: 3.1421 - accuracy: 0.8292 - val_loss: 18.8289 - val_accuracy: 0.6644
+Epoch 20/30
+66/66 [==============================] - 635s 10s/step - loss: 6.4919 - accuracy: 0.7661 - val_loss: 2.9930 - val_accuracy: 0.8255
+Epoch 21/30
+66/66 [==============================] - 545s 8s/step - loss: 4.8091 - accuracy: 0.8028 - val_loss: 8.3156 - val_accuracy: 0.6376
+Epoch 22/30
+66/66 [==============================] - 531s 8s/step - loss: 2.9019 - accuracy: 0.8402 - val_loss: 2.3717 - val_accuracy: 0.8408
+Epoch 23/30
+66/66 [==============================] - 531s 8s/step - loss: 1.7230 - accuracy: 0.8647 - val_loss: 2.7673 - val_accuracy: 0.8648
+Epoch 24/30
+66/66 [==============================] - 534s 8s/step - loss: 0.8965 - accuracy: 0.8995 - val_loss: 1.7690 - val_accuracy: 0.8849
+Epoch 25/30
+66/66 [==============================] - 539s 8s/step - loss: 2.6251 - accuracy: 0.8357 - val_loss: 4.1702 - val_accuracy: 0.8389
+Epoch 26/30
+66/66 [==============================] - 531s 8s/step - loss: 1.0181 - accuracy: 0.8925 - val_loss: 2.2412 - val_accuracy: 0.7498
+Epoch 27/30
+66/66 [==============================] - 531s 8s/step - loss: 0.5802 - accuracy: 0.9172 - val_loss: 8.2554 - val_accuracy: 0.7498
+Epoch 28/30
+66/66 [==============================] - 531s 8s/step - loss: 2.4771 - accuracy: 0.8311 - val_loss: 2.2516 - val_accuracy: 0.8562
+Epoch 29/30
+66/66 [==============================] - 532s 8s/step - loss: 1.0433 - accuracy: 0.8899 - val_loss: 9.1697 - val_accuracy: 0.5666
+Epoch 30/30
+66/66 [==============================] - 531s 8s/step - loss: 2.1396 - accuracy: 0.8565 - val_loss: 2.6976 - val_accuracy: 0.7325

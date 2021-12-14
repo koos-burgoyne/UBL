@@ -4,5 +4,6 @@ This dataset is made up of three fasta files:
     - neg-zinc-finger.fa: protein sequences that are not ubiquitin ligases, but have a "zinc finger"
     - pos_neg-unip.fa: protein sequences from pos-ubl.fa and neg-uniprot.fa
     - pos_neg.fa: all protein sequences from the first three files - protein sequences that are identified as UBL and those that are not, including the zinc finger sequences for false positive testing
+    - ubl_zinc.fa: all sequences from the known UBL set and all sequences from the zinc finger set
 
 The zinc finger sequences are supposed to be something of a false positive trap.

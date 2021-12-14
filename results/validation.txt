@@ -1,0 +1,35 @@
+Importing data/pos_neg.fa
+    2 classes
+    56108 sequences
+    [ 3258 52850] class counts
+
+Converting to features:
+  Num Classes: 2
+  Class Counts:
+       0      1
+       3258  52850
+  Resampling:
+    Dataset size : 56108
+    Total/class  : 3258
+    Total samples: 6516
+
+Time taken: 163.839 sec
+shape of X: (6514, 28, 5537)
+shape of y: (6514,)
+
+Total time for validation: 22min
+
+Number of validation samples: 6449
+(65, 28, 5537)
+(6514,)
+(6449, 28, 5537)
+(6449, 2)
+202/202 [==============================] - 215s 1s/step - loss: 7.7291 - accuracy: 0.7510
+[[2808  412]
+ [1194 2035]]
+202/202 [==============================] - 218s 1s/step - loss: 1.8192 - accuracy: 0.8877
+[[3211    9]
+ [ 715 2514]]
+202/202 [==============================] - 214s 1s/step - loss: 2.0480 - accuracy: 0.7693
+[[1865 1355]
+ [ 133 3096]]
