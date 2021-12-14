@@ -173,44 +173,6 @@ def raw_to_features(data,balance=False,resample=1.0):
 
     # Return features and labels
     return X,y
-    """# Instantiate new data storage
-    X = np.zeros((num_samples,max_seq_len), dtype=np.object_)
-    y = np.zeros(num_samples)      # This implies that there are always 2 classes
-    # Iterate over the data filling in X and y
-    class_val = -1
-    X_line = 0
-    line = 0
-    class_count = 0
-    while line < n:
-        # TODO: Track and print progress
-        #if line%(n/100)==0:
-        #    print(str(line/n*100)+"%",end="\r")
-        # Assign the class value
-        if "class" in data[line]:
-            class_val = int(data[line][-1])
-            line+=1
-            class_count += 1
-            continue
-        # If the class quota is met, then continue to next class
-        if class_counts[class_val] == total_per_class:
-                if class_count == num_classes:
-                    break
-                while line < n and "class" not in data[line]:
-                    line += 1
-                continue
-        # Fill in the data instance, and pad it with zeros
-        class_counts[class_val] += 1
-        m = len(data[line])
-        for char in range(max_seq_len):
-            if char < m:
-                X[X_line][char] = data[line][char]
-            else:
-                X[X_line][char] = 0
-        y[X_line] = int(class_val)
-        X_line += 1
-        # loop increment
-        line += 1
-    print()"""
 
 # Function info here ...
 def sequences_to_features(sequences):
