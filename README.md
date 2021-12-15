@@ -20,37 +20,22 @@ The loss function is categorical cross-entropy and the optimizer is Adam.
 #### Data Split
 In this testing iteration, the data was split 80:20 into modelling/validation data, and the modelling data was then split again 80:20 into train:test.
 #### Results
-From today's (Mon Dec 13, 2021) testing with balanced data that features no zinc finger negatives, featuring improved feature extraction, and arbitrary model layers:
-  * Model train time    : 4hr 22min
-  * Final Train Accuracy: 97.36%
-  * Final Test Accuracy : 94.15%
-  * Validation Accuracy : 95.32%
-
-From training and validation results on a second model with imbalanced data that excludes zinc finger negatives:
-  * Final Train Accuracy: 92.4%
-  * Final Test Accuracy : 83.29% (mean)
-  * Validation Accuracy : 82.53%
-
-From training and validation results on a third model that includes zinc finger negatives:
-  * Final Train Accuracy: 85.65%
-  * Final Test Accuracy : 73.25%
-  * Validation Accuracy : 76.75%
-
-From validation results on Tue Dec 14, 2021 validating with 6449 samples from the dataset that includes zinc finger negatives, split by the two classes (roughly 1:1), the accuracy of the models are:
+Four models were trained, each on a separate dataset. The four datasets, and the performance of the model trained on them, are set out in the bullet points below. From validation results validating with 6449 samples from the dataset that includes zinc finger negatives, split by the two classes (roughly 1:1), the accuracy of the model in each iteration of testing is:
   * Training data without zinc finger negatives:
-    * Model trained on imbalanced data: 75.1%
-    * Model trained on balanced data: 88.77%
-  * Training data with zinc finger negatives:
-    * Model trained on balanced data: 76.93%
-  * Training data with only zinc finger sequences as negatives:
-    * Awaiting results...
+    * Unbalanced data, model accuracy: 75.1%
+    * Balanced data, model accuracy: 88.77%
+  * Training data (balanced) with zinc finger negatives:
+    * Accuracy: 76.93% (false positive rate of ~30%)
+  * Training data (balanced) with only zinc finger sequences as negatives:
+    * Accuracy: 87.16%
 
 ![Classification percent accuracy by epoch](/results/test1_acc.png "Classification percent accuracy by epoch")
-This figure shows the results of testing without negative sequences that have a zinc finger. The accuracy is quite high and could potentially be improved. However this does not include the negative sequences with a zinc finger which can be a source of false positives. The impact of this is being tested currently in a fourth test iteration.
 
-With these tests, it seems increasingly likely that with a well planned model (or perhaps an ensemble), more training epochs, and a thoughtfully formatted dataset, this method has the potential to perform the required task to a high degree of accuracy.
+This figure shows the results of testing without negative sequences that have a zinc finger. The accuracy is quite high and could potentially be improved. It has not yet converged showing that more epochs can improve performance.
 
-A more detailed examination of the results will be forthcoming.
+With these tests, it seems likely that with a well planned model (or perhaps an ensemble), more training epochs, and a thoughtfully formatted dataset, this method has the potential to perform the required task to a high degree of accuracy.
+
+A more detailed examination of the results is contained in the Testing_report.pdf document in this repository.
 
 ### More
 To read more about a previous attempt at UBL classification, see:
