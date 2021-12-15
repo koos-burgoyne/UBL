@@ -24,12 +24,43 @@ Number of validation samples: 6449
 (6514,)
 (6449, 28, 5537)
 (6449, 2)
+
+Model trained on imbalanced data without zinc finger
 202/202 [==============================] - 215s 1s/step - loss: 7.7291 - accuracy: 0.7510
 [[2808  412]
  [1194 2035]]
+
+Model trained on Balanced data without zinc finger
 202/202 [==============================] - 218s 1s/step - loss: 1.8192 - accuracy: 0.8877
 [[3211    9]
  [ 715 2514]]
+
+Model trained on balanced data with zinc finger mixed in
 202/202 [==============================] - 214s 1s/step - loss: 2.0480 - accuracy: 0.7693
 [[1865 1355]
  [ 133 3096]]
+
+
+Number of validation samples: 6449
+(6449, 28, 5537)
+(6449, 2)
+
+Model trained on imbalanced data without zinc finger
+202/202 [==============================] - 185s 913ms/step - loss: 8.0593 - accuracy: 0.7457
+[[2806  414]
+ [1226 2003]]
+
+Model trained on Balanced data without zinc finger
+202/202 [==============================] - 186s 919ms/step - loss: 2.0117 - accuracy: 0.8721
+[[3211    9]
+ [ 816 2413]]
+
+Model trained on balanced data with zinc finger mixed in
+202/202 [==============================] - 186s 922ms/step - loss: 2.0666 - accuracy: 0.7688
+[[1864 1356]
+ [ 135 3094]]
+
+Model trained on balanced data with only zinc finger as negative
+202/202 [==============================] - 187s 924ms/step - loss: 2.7273 - accuracy: 0.8716
+[[2825  395]
+ [ 433 2796]]
