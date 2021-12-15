@@ -1,11 +1,23 @@
 # File info here ...
 
-# Import numpy library for use in ...
 import numpy as np
-# Import os library for use in ...
 import os
-# Import matplotlib.pyplot for use in ...
 import matplotlib.pyplot as plt
+
+amino_acids = {
+    "A":0, "R":1, "N":2, "D":3, "C":4, "Q":5, "E":6, "G":7, "H":8, "I":9, "L":10, "K":11, "M":12, "F":13, "P":14, "S":15, "T":16, "W":17, "Y":18, "V":19
+}
+
+VHSE_descriptors = {
+    0:{"A":0.15, "R":-1.47, "N":-0.99, "D":-1.15, "C":0.18, "Q":-.96, "E":-1.18, "G":-0.2, "H":-0.43, "I":1.27, "L":11.36, "K":-1.17, "M":1.01, "F":1.52, "P":0.22, "S":-0.67, "T":-0.34, "W":1.5, "Y":0.61, "V":0.76},
+    1:{"A":-1.11, "R":1.45, "N":0,     "D":0.67, "C":-1.67, "Q":0.12, "E":0.4, "G":-1.53, "H":-0.25, "I":-0.14, "L":0.07, "K":0.7, "M":-0.53, "F":0.61, "P":-0.17, "S":-0.86, "T":-0.51, "W":2.06, "Y":1.6, "V":-0.92},
+    2:{"A":-1.35, "R":1.24, "N":-0.37, "D":-0.41, "C":-0.46, "Q":0.18, "E":0.1, "G":-2.63, "H":0.37, "I":0.3, "L":0.26, "K":0.7, "M":0.43, "F":0.96, "P":-0.5, "S":-1.07, "T":-0.55, "W":1.79, "Y":1.17, "V":0.17},
+    3:{"A":-0.92, "R":1.27, "N":0.69, "D":-0.01, "C":-.021, "Q":0.16, "E":0.36, "G":2.28, "H":0.19, "I":-1.8, "L":-0.8, "K":0.8, "M":0, "F":-0.16, "P":0.05, "S":-0.41, "T":-1.06, "W":0.75, "Y":0.73, "V":-1.91},
+    4:{"A":0.02, "R":1.55, "N":-0.55, "D":-2.68, "C":0, "Q":0.09, "E":-2.16, "G":-0.53, "H":0.51, "I":0.3, "L":0.22, "K":1.64, "M":0.23, "F":0.25, "P":-0.01, "S":-0.32, "T":0.01, "W":0.75, "Y":0.53, "V":0.22},
+    5:{"A":-0.91, "R":1.47, "N":0.85, "D":1.31, "C":1.2, "Q":0.42, "E":-0.17, "G":-1.18, "H":1.28, "I":-1.61, "L":-1.37, "K":0.67, "M":0.1, "F":0.28, "P":-1.43, "S":0.27, "T":-0.01, "W":-0.13, "Y":0.25, "V":-1.4},
+    6:{"A":0.36, "R":1.3, "N":0.73, "D":0.03, "C":-1.61, "Q":-0.2, "E":0.91, "G":2.01, "H":0.93, "I":-0.16, "L":0.08, "K":1.63, "M":-0.86, "F":-1.33, "P":-0.19, "S":-0.64, "T":-0.79, "W":-1.06, "Y":-0.96, "V":-0.24},
+    7:{"A":-0.48, "R":0.83, "N":-0.8, "D":0.56, "C":-0.19, "Q":-0.41, "E":0.02, "G":-1.34, "H":0.65, "I":-0.13, "L":-0.62, "K":0.13, "M":-0.68, "F":-0.2, "P":3.56, "S":0.11, "T":0.39, "W":-0.85, "Y":-0.52, "V":-0.03}
+}
 
 # Function info here ...
 def import_fa(file_name, return_labels=False):
@@ -76,8 +88,11 @@ def import_folder(folder_path, return_names=False):
         return np.array(files, dtype=object)
 
 # Function info here ...
-def raw_to_features(data,balance=False,resample=1.0):
+def raw_to_features(data,resample=1.0,balance=False):
     print("\nConverting to features:")
+    num_VHSE = len(VHSE_descriptors)
+    num_AA = len(amino_acids)
+    num_features = num_AA + num_VHSE
     n = len(data)
     # Find basic data stats for function use:
     #   the max length sequence in the data
@@ -86,12 +101,15 @@ def raw_to_features(data,balance=False,resample=1.0):
     max_seq_len = 0
     class_counts = [0]
     num_classes = -1
-    # Iterate over all sequences
+    # Iterate over all sequences to count num classes, class frequencies, and the max sequence length
     for line in data:
         # Look out for a new class
         if "class" in line:
-            class_counts.append(1)
+            class_counts.append(0)
             num_classes += 1
+            continue
+        # Skip labels
+        elif line[0] == ">":
             continue
         # Update max sequence length
         if len(line) > max_seq_len:
@@ -101,6 +119,7 @@ def raw_to_features(data,balance=False,resample=1.0):
     
     # Since this was -1 based, increment to convert to 0 based count
     num_classes += 1
+    n -= num_classes
     
     # Print stats found above
     print("  Num Classes:", num_classes)
@@ -113,13 +132,19 @@ def raw_to_features(data,balance=False,resample=1.0):
 
     # Split data by class for resampling
     data_by_class = []
+    start_idx = 1
+    end_idx = start_idx + class_counts[1]
     for i in range(num_classes):
-        data_by_class.append( data[class_counts[i]:class_counts[i+1]] )
-    
-    # Instantiate storage of features and labels
-    X = []
-    y = []
-    
+        new_class = data[start_idx+1:end_idx]
+        np.random.shuffle(new_class)
+        data_by_class.append( new_class )
+        if i < num_classes-1:
+          #print(start_idx, end_idx, class_counts[i+2], class_counts)
+          start_idx += end_idx
+          end_idx = start_idx + class_counts[i+2]
+
+    #print("data by class:",data_by_class)
+
     # Init variables for resampling
     total_per_class = 0
     num_samples = n
@@ -131,48 +156,64 @@ def raw_to_features(data,balance=False,resample=1.0):
         if balance:
             # Calculate a balanced total number of instances per class
             total_per_class = int(num_samples/num_classes)
-            # Pull instances
-            for i in range(num_classes):
-                for j in range(1,total_per_class+1): 
-                    X.append( data_by_class[i][j] )
-            # Pull labels
-            for i in range(num_classes):
-                for j in range(total_per_class):
-                    y.append(i)
+            if total_per_class > min(np.array(class_counts)[1:]):
+                total_per_class = min(np.array(class_counts)[1:])
+            #print("\ntotal/class:", total_per_class, "\n")
+            for i in range(len(data_by_class)):
+                indexes = np.random.default_rng().choice(len(data_by_class[i]), size=total_per_class-1, replace=False)
+                #print("idxs:",indexes)
+                data_by_class[i] = data_by_class[i][indexes]
+            
         # If imbalanced class counts are acceptable
         else:
             # Calculate the total number of instances per class in the same ratio as class counts
             total_per_class = [int(num_samples*class_counts[i+1]/n) for i in range(num_classes)]
-            # Pull instances
-            for i in range(num_classes):
-                for j in range(total_per_class[i]+1,total_per_class[i+1]+1):
-                    X.append( data_by_class[i][j] )
-            # Pull labels
-            for i in range(num_classes):
-                for j in range(total_per_class):
-                    y.append(i)
+            #print("total/class:",total_per_class)
+            for i in range(len(data_by_class)):
+                indexes = np.random.default_rng().choice(len(data_by_class[i]), size=total_per_class[i]-1, replace=False)
+                data_by_class[i] = data_by_class[i][indexes]
+            
         print("  Resampling:")
-        print("    Total samples:",num_samples)
+        print("    Dataset size :",n)
         print("    Total/class  :",total_per_class)
+        print("    Total samples:",total_per_class*num_classes)
         print()
     # If not resampling
     # TODO:  Complete - could the above be used instead of conditional?
     else:
         total_per_class = int(n/num_classes)
     
+    #print("data by class:",data_by_class)
+    
+    # Instantiate storage of features and labels
+    X = []
+    y = []
+      
     # Convert from strings to arrays and pad the sequences with zeros to 
     # the length of the maximum length sequence; this is the number of features
-    for i in range(len(X)):
-        # Instantiate new array of zeros
-        new_instance = [0 for i in range(max_seq_len)]
-        # Fill in sequence
-        for j in range(len(X[i])):
-            new_instance[j] = X[i][j]
-        # Store new sequence in features store X
-        X[i] = new_instance
+    index = 0
+    for i in range(len(data_by_class)):
+        for j in range(len(data_by_class[i])):
+            # Instantiate new array of zeros
+            new_instance = []
+            for k in range(num_VHSE):
+                new_instance.append([-999 for acid in range(max_seq_len)])
+            for k in range(num_AA):
+                new_instance.append([0 for acid in range(max_seq_len)])
+            # Fill in sequence
+            for k in range(len(data_by_class[i][j])):
+                acid_char = data_by_class[i][j][k]
+                if acid_char in amino_acids:
+                    for l in range(num_VHSE):
+                        new_instance[l][k] = VHSE_descriptors[l][acid_char]
+                    new_instance[amino_acids[acid_char]+num_VHSE][k] = 1
+            # Store new sequence in features store X
+            X.append(new_instance)
+            y.append(i)
+            index += 1
 
     # Return features and labels
-    return X,y
+    return np.array(X),np.array(y),max_seq_len
 
 # Function info here ...
 def sequences_to_features(sequences):
