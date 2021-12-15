@@ -1,9 +1,8 @@
 ## Ubiquitin Ligase Classification
 
-This is a work in progress. At this point I have improved on the data formatting in data_format.py and have the testing for this embedded on UBL.py.
+This is a work in progress. At this point I have improved on the data formatting in data_format.py and have the testing for this embedded on UBL.py. These scripts are contained in the functions_and_unit-testing folder.
 
-I have a basic implementation for a 2D Convolutional Neural Network (in the notebook 2D_CNN.ipynb) to classify UBL proteins in contrast to a set of other non-UBL proteins. 
-Given the current result set, I think it's reasonable that the next step should be to include the set of known false-positive non-UBLs as a third class and report on the classification accuracy.
+I have a basic implementation for a 2D Convolutional Neural Network (in the notebook titled 2D_CNN.ipynb) to classify UBL proteins in contrast to a set of other non-UBL proteins. Validation of the models produced, described below in the results section, is performed in the notebook titled 2D_CNN_validation.ipynb.
 
 ### Current Status
 #### Features
