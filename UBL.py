@@ -12,15 +12,11 @@ def main():
         # If the first argument is "file", call the import_fa() function to retrieve the sequences
         if sys.argv[1] == "file":
             data = format.import_fa(sys.argv[2])
-            X, y = format.raw_to_features(data,balance=True,resample=0.01)
-            #print(X[0:2])
-            #print(y[0:2])
 
         # If the first argument is "folder", read the .fa files in the given folder
         elif sys.argv[1] == "folder":
             folder_contents,file_names = format.import_folder(sys.argv[2], return_names=True)
             format.print_stats(folder_contents,file_names,plot=True)
-            #X, y = format.retrieve_features(folder_contents,fnames=file_names)
 
         # If the first argument is neither 'file' nor 'folder', print error message and exit
         else:
